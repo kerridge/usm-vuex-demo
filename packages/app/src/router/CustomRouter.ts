@@ -1,10 +1,10 @@
 import Vue from "vue";
 import Router from "vue-router";
 import { injectable } from "inversify";
-import Module from "../../lib/baseModule";
+import Module from "../lib/baseModule";
 
 @injectable()
-export default class Navigation extends Module {
+export default class CustomRouter extends Module {
   public router?: Router;
 
   constructor(...args: []) {

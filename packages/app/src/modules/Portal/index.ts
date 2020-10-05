@@ -2,33 +2,42 @@ import { injectable, inject } from 'inversify';
 import Module from "../../lib/baseModule";
 import Counter from "../Counter";
 import Todos from "../Todos";
-import Navigation from "../Navigation";
+import Organization from "../../main/organization/OrganizationViewModel"
+import CustomRouter from "../../router/CustomRouter"
 import moduleConnect from '../../lib/moduleConnect';
 
 export interface AppOptions {
   main: any;
-  components: any;
+  routes: any;
 }
 
-interface PortalDeps {
+interface PortalDependencies {
+  // ViewModels
   counter: Counter;
   todos: Todos;
-  navigation: Navigation;
+  organization: Organization
+
+  // Vue specific modules
+  router: CustomRouter;
   appOptions: AppOptions;
 }
+
 @injectable()
-export default class Portal extends Module<PortalDeps> {
+export default class Portal extends Module<PortalDependencies> {
   constructor(
     @inject("Counter") counter: Counter,
     @inject("Todos") todos: Todos,
-    @inject("Navigation") navigation: Navigation,
+    @inject("Organization") organization: Organization,
+    @inject("CustomRouter") router: CustomRouter,
     @inject("AppOptions") appOptions: AppOptions,
   ) {
     const params = {
       modules: {
         counter,
-        navigation,
         todos,
+        organization,
+
+        router,
         appOptions
       }
     };
@@ -44,8 +53,12 @@ export default class Portal extends Module<PortalDeps> {
     return this._modules.todos;
   }
 
-  get navigation() {
-    return this._modules.navigation;
+  get router() {
+    return this._modules.router;
+  }
+
+  get organization() {
+    return this._modules.organization;
   }
 
   get main() {
@@ -53,7 +66,7 @@ export default class Portal extends Module<PortalDeps> {
   }
 
   get routes() {
-    return Object.entries(this._modules.appOptions.components)
+    return Object.entries(this._modules.appOptions.routes)
       .map((item: any) => {
         const [name, {path, screen, module}] = item;
         const component = moduleConnect(screen, module);
@@ -66,7 +79,7 @@ export default class Portal extends Module<PortalDeps> {
   }
 
   createApp() {
-    const router = this.navigation.createRouter(this.routes);
+    const router = this.router.createRouter(this.routes);
     return {
       router,
       store: this.store,

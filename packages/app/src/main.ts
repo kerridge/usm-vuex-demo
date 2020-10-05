@@ -1,39 +1,33 @@
 import "reflect-metadata";
-import Vue from "vue";
 import "./registerServiceWorker";
+import Vue from "vue";
 import { load } from "./lib/loader";
+import { routes } from "./router/Routes"
+import CustomRouter from "./router/CustomRouter"
 import Portal from "./modules/Portal";
+
 import Counter from "./modules/Counter";
 import Todos from "./modules/Todos";
-import Navigation from "./modules/Navigation";
+import Organization from "./main/organization/OrganizationViewModel"
+
 import App from "./App.vue";
-import TodosView from "./components/Todos";
-import CounterView from "./components/Counter";
 
 Vue.config.productionTip = false;
 
 const { portal, app } = load({
   bootstrap: "Portal",
   modules: {
+    // Custom modules
     Counter,
     Todos,
+    Organization,
+    
+    // Vue specific modules
     Portal,
-    Navigation
+    CustomRouter
   },
   main: App,
-  components: {
-    home: {
-      screen: TodosView,
-      path: "/",
-      module: "todos"
-    },
-    counter: {
-      // screen: CounterView,
-      screen: () => import("./components/Counter"),
-      path: "/counter",
-      module: "counter"
-    }
-  }
+  routes: routes
 });
 
 Vue.prototype.portal = portal;
